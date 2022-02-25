@@ -8,8 +8,12 @@ var app = http.createServer(function(request,response){
     var queryData = url.parse(_url, true).query;
     var pathname = url.parse(_url, true).pathname;
     var title = queryData.id;
+    var basicDescription;
 
-    if (_url=='/') title = "Welcome";
+    if (_url=='/') {
+        title = "Welcome";
+        basicDescription = "Hello, this is main page";
+    };
 
     if(pathname === '/'){
         try{
@@ -29,7 +33,7 @@ var app = http.createServer(function(request,response){
                                     <li><a href="/?id=JavaScript">JavaScript</a></li>
                                 </ul>
                                 <h2>${title}</h2>
-                                ${description}
+                                ${basicDescription ?? description}
                             </body>
                         </html>
                 `;
