@@ -3,6 +3,39 @@ var fs = require("fs");
 var url = require("url");
 //url 모듈을 사용
 
+function templateHTML(title, listTemplate, body) {
+  var template = `
+          <!doctype html>
+            <html>
+                <head>
+                    <title>WEB1 - ${title}</title>
+                    <meta charset="utf-8">
+                </head>
+                <body>
+                    <h1><a href="/">WEB</a></h1>
+                    <ul>
+                        ${listTemplate}
+                    </ul>
+                    ${body}
+                </body>
+            </html>
+        `;
+
+  return template;
+}
+
+function templateList(fileList) {
+  var listTemplate = "";
+
+  fileList.map((item) => {
+    listTemplate += `<li>
+              <a href="/?id=${item}">${item}</a>
+            </li>`;
+  });
+
+  return listTemplate;
+}
+
 var app = http.createServer(function (request, response) {
   var _url = request.url;
   var queryData = url.parse(_url, true).query;
@@ -17,37 +50,19 @@ var app = http.createServer(function (request, response) {
     }
 
     try {
-      var listTemplate = "";
-
       fs.readdir("./data", function (error, fileList) {
-        fileList.map((item) => {
-          listTemplate += `<li>
-              <a href="/?id=${item}">${item}</a>
-            </li>`;
-        });
-      });
-      // 중간에 ""가 출력되는 이유가 궁금
+        var listTemplate = templateList(fileList);
 
-      fs.readFile(`data/${queryData.id}`, "utf-8", function (err, description) {
-        var template = `
-          <!doctype html>
-            <html>
-                <head>
-                    <title>WEB1 - ${title}</title>
-                    <meta charset="utf-8">
-                </head>
-                <body>
-                    <h1><a href="/">WEB</a></h1>
-                    <ul>
-                        ${listTemplate}
-                    </ul>
-                    <h2>${title}</h2>
-                    ${basicDescription ?? description}
-                </body>
-            </html>
-        `;
-        response.writeHead(200);
-        response.end(template);
+        fs.readFile(
+          `data/${queryData.id}`,
+          "utf-8",
+          function (err, description) {
+            var body = `<h2>${title}</h2>${basicDescription ?? description}`;
+            var template = templateHTML(title, listTemplate, body);
+            response.writeHead(200);
+            response.end(template);
+          }
+        );
       });
     } catch (error) {
       response.end("에러가 발생하였습니다.");
