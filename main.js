@@ -89,20 +89,19 @@ var app = http.createServer(function (request, response) {
 
       request.on("data", (data) => {
         body += data;
-        console.log(data);
       });
 
       request.on("end", () => {
         var query = new URLSearchParams(body);
-        var title = new URLSearchParams(body).get("title");
-        var description = new URLSearchParams(body).get("description");
-        console.log(body, query, title, description, "데이터");
-        console.log("No more data");
+        var title = query.get("title");
+        var description = query.get("description");
+
+        fs.writeFile(`data/${title}`, description, "utf-8", (err) => {
+          response.writeHead(302, { Location: encodeURI(`/?id=${title}`) });
+          response.end();
+        });
       });
     }
-
-    response.writeHead(200);
-    response.end("success");
   } else {
     response.writeHead(404);
     response.end("not Found");
