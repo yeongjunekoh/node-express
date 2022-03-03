@@ -16,6 +16,7 @@ function templateHTML(title, listTemplate, body) {
                     <ul>
                         ${listTemplate}
                     </ul>
+                    <a href="/create">create</a>
                     ${body}
                 </body>
             </html>
@@ -48,7 +49,6 @@ var app = http.createServer(function (request, response) {
       title = "Welcome";
       basicDescription = "Hello, this is main page";
     }
-
     try {
       fs.readdir("./data", function (error, fileList) {
         var listTemplate = templateList(fileList);
@@ -67,6 +67,21 @@ var app = http.createServer(function (request, response) {
     } catch (error) {
       response.end("에러가 발생하였습니다.");
     }
+  } else if (pathname === "/create") {
+    fs.readdir("./data", function (error, fileList) {
+      var listTemplate = templateList(fileList);
+      var body = `
+        <form action="http://localhost:3000/process_create" method="post">
+          <p><input type="text" name="title" /></p>
+          <p><textarea name="description"></textarea></p>
+          <p><input type="submit" /></p>
+        </form>
+      `;
+      var template = templateHTML(title, listTemplate, body);
+
+      response.writeHead(200);
+      response.end(template);
+    });
   } else {
     response.writeHead(404);
     response.end("not Found");
