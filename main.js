@@ -1,6 +1,7 @@
 var http = require("http");
 var fs = require("fs");
 var url = require("url");
+const { title } = require("process");
 //url 모듈을 사용
 
 function templateHTML(title, listTemplate, body) {
@@ -71,7 +72,7 @@ var app = http.createServer(function (request, response) {
     fs.readdir("./data", function (error, fileList) {
       var listTemplate = templateList(fileList);
       var body = `
-        <form action="http://localhost:3000/process_create" method="post">
+        <form action="http://localhost:3000/create_process" method="post">
           <p><input type="text" name="title" /></p>
           <p><textarea name="description"></textarea></p>
           <p><input type="submit" /></p>
@@ -82,6 +83,26 @@ var app = http.createServer(function (request, response) {
       response.writeHead(200);
       response.end(template);
     });
+  } else if (pathname === "/create_process") {
+    if (request.method == "POST") {
+      var body = "";
+
+      request.on("data", (data) => {
+        body += data;
+        console.log(data);
+      });
+
+      request.on("end", () => {
+        var query = new URLSearchParams(body);
+        var title = new URLSearchParams(body).get("title");
+        var description = new URLSearchParams(body).get("description");
+        console.log(body, query, title, description, "데이터");
+        console.log("No more data");
+      });
+    }
+
+    response.writeHead(200);
+    response.end("success");
   } else {
     response.writeHead(404);
     response.end("not Found");
